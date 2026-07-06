@@ -6,7 +6,7 @@
 |---|---:|---:|---:|---|
 | Cloud Practitioner | Not started | TBD | - | Low difficulty; can be done later unless needed for momentum |
 | AI Practitioner | Not started | TBD | - | Likely quick win after AI service review |
-| Solutions Architect - Associate | Next candidate | TBD | - | Best first checkpoint |
+| Solutions Architect - Associate | Quiz-ready | TBD | - | SAA workspace prepared; next action is 30-question diagnostic quiz |
 | Developer - Associate | Not started | TBD | - | Overlaps with Lambda, API Gateway, DynamoDB, CI/CD |
 | CloudOps Engineer - Associate | Not started | TBD | - | Needs CloudWatch, SSM, operations, troubleshooting |
 | Data Engineer - Associate | Not started | TBD | - | Data pipeline and analytics services |
@@ -16,6 +16,10 @@
 | Generative AI Developer - Professional | Not started | TBD | - | Newer exam; official guide first |
 | Security - Specialty | Not started | TBD | - | IAM/KMS/SCP/logging need depth |
 | Advanced Networking - Specialty | Not started | TBD | - | Check retirement/availability before planning |
+
+## Current next action
+
+Start the SAA 30-question diagnostic quiz using `exams/saa/diagnostic-quiz-plan.md`.
 
 ## Weak areas found from initial quiz
 
