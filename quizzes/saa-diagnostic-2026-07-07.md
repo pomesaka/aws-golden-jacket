@@ -6,6 +6,7 @@
 |---|---:|---:|---|
 | Q1 | Correct | 4/5 | S3 SSE-KMS / KMS key policy |
 | Q2 | Correct | 5/5 | Session affinity vs external session store |
+| Q3 | Correct | 5/5 | S3 Gateway VPC Endpoint |
 
 ## Q1: S3 invoice PDFs with company-managed encryption key
 
@@ -110,3 +111,51 @@ Externalizing session state is architecturally cleaner, but it requires applicat
 ### Mistake type
 
 No mistake. This was a high-confidence correct answer, with a useful caveat about long-term architecture.
+
+## Q3: Private subnet EC2 access to S3 with NAT Gateway cost problem
+
+### Question summary
+
+EC2 instances in private subnets access S3 through a NAT Gateway. Data transfer volume has grown and NAT Gateway cost is now a problem.
+
+Requirements:
+
+- Keep EC2 in private subnets
+- Avoid internet path to S3
+- Minimize cost
+- Avoid application changes
+
+### User answer
+
+Answer: B
+
+Confidence: 5/5
+
+Reason:
+
+- S3 and DynamoDB support Gateway VPC Endpoints.
+- Gateway VPC Endpoints can provide a route from inside the VPC without NAT Gateway.
+- This is the direct answer.
+
+### Evaluation
+
+Result: Correct.
+
+Correct answer: B.
+
+### Why
+
+For S3 access from private subnets, an S3 Gateway VPC Endpoint associated with the relevant route tables avoids NAT Gateway routing and does not require application changes.
+
+### Trap
+
+S3 also supports Interface Endpoints, but when the question emphasizes private S3 access and cost minimization, Gateway Endpoint is the expected answer.
+
+### Related notes
+
+- `comparisons/vpc-gateway-endpoint-vs-interface-endpoint.md`
+- `services/kms.md`
+
+### Mistake type
+
+No mistake. Strong answer.
