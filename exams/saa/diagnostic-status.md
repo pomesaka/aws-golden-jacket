@@ -2,13 +2,39 @@
 
 ## Current position
 
-- Completed through: Q20
+- Completed through: Q21
 - Q19: invalid question; excluded from scoring
-- Next question: Q21
+- Next question: Q22
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q21 - Route 53 vs CloudFront vs Global Accelerator
+
+- User answer: C
+- Correct answer: C
+- Confidence: 5/5
+- Result: Correct
+- Risk level: Low
+
+Why:
+
+- AWS Global Accelerator provides static anycast IP addresses.
+- It supports TCP and UDP listeners.
+- It routes users onto the AWS global network toward healthy regional endpoints.
+- Health checks and endpoint failover are not dependent on waiting for DNS caches to expire.
+- Route 53 latency-based routing can choose a low-latency region, but it does not itself provide fixed IP addresses and DNS caching can delay failover.
+- CloudFront is primarily an HTTP/HTTPS content delivery service and does not fit arbitrary TCP and UDP application traffic.
+
+Reasoning quality:
+
+- Correctly identified fixed IP plus global routing optimization as the decisive combination.
+- Correctly rejected Route 53 because an additional fixed-IP mechanism would be needed and DNS caching remains relevant.
+- Correctly rejected CloudFront for this TCP/UDP workload.
+- The statement that weighted routing is not path optimization was also directionally correct.
+
+## Previous result
 
 ### Q20 - Disaster recovery strategy
 
@@ -20,52 +46,17 @@
 
 Why:
 
-- Multi-site (A) provides the fastest recovery but has the highest steady-state cost.
-- Warm standby (B) keeps a scaled-down but functional application environment running in the recovery Region, so its steady-state cost is higher than pilot light.
-- Backup and restore (C) has the lowest steady-state cost but is unlikely to satisfy both RPO 15 minutes and RTO 1 hour when all resources must be rebuilt from snapshots.
-- Pilot light (D) keeps the critical data layer and minimal core resources ready, continuously replicates data, and scales out the stateless application tier after a disaster.
-- Given RPO 15 minutes, RTO 1 hour, stateless application servers, and a requirement to minimize normal operating cost, pilot light is the best fit.
+- Multi-site provides the fastest recovery but has the highest steady-state cost.
+- Warm standby keeps a scaled-down functional environment running continuously, so it costs more than pilot light.
+- Backup and restore has the lowest steady-state cost but usually has a longer RTO.
+- Pilot light keeps critical data and minimal core resources ready, then scales the stateless application tier after a disaster.
 
-Reasoning quality:
-
-- Correctly rejected multi-site because of cost.
-- Correctly narrowed the decision to warm standby versus pilot light.
-- Incorrectly assumed warm standby was cheaper than pilot light; the opposite is generally true because warm standby keeps a working scaled-down environment running continuously.
-- Snapshot frequency primarily affects RPO, not RTO. RTO is dominated by how long restoration, provisioning, scaling, validation, and DNS failover take.
-
-## Previous result
+## Invalid question
 
 ### Q19 - Cross-account S3 + SSE-KMS
 
-- User answer: no final selection; reasoning narrowed to A and B and questioned whether the KMS key policy was also required
-- Intended prompt: choose two
-- Actual required controls: A, B, and C
 - Result: Invalid question; excluded from scoring
-- Risk level: None assigned
-
-Why the question was invalid:
-
-- The IAM role in account B needs identity permissions for `s3:GetObject` and `kms:Decrypt`.
-- The S3 bucket policy in account A must allow the cross-account principal to read the object.
-- The KMS key policy in account A must allow the role or account B to use the KMS key; the role's IAM policy alone cannot make an external KMS key usable.
-- Therefore, the correct design requires three authorization layers, but the prompt required exactly two selections.
-
-## Earlier valid result
-
-### Q18 - RDS Multi-AZ vs Read Replica
-
-- User answer: B
-- Correct answer: B
-- Confidence: 4/5
-- Result: Correct
-- Risk level: Low
-
-Why:
-
-- RDS Multi-AZ is primarily for high availability and automatic failover.
-- A traditional Multi-AZ standby is not used to serve read traffic.
-- A Read Replica uses asynchronous replication and can offload read-heavy reporting queries.
-- Keeping Multi-AZ while adding a Read Replica preserves failover capability and reduces load on the primary DB.
+- Actual required controls: identity permissions, S3 bucket policy, and KMS key policy
 
 ## Operating rules
 
