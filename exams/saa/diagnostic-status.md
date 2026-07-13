@@ -3,11 +3,35 @@
 ## Current position
 
 - Completed through: Q18
-- Next question: Q19
+- Q19: invalid question; excluded from scoring
+- Next question: Q20
 - Mode: hard mode from Q15 onward
-- Target total: 30 questions
+- Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q19 - Cross-account S3 + SSE-KMS
+
+- User answer: no final selection; reasoning narrowed to A and B and questioned whether the KMS key policy was also required
+- Intended prompt: choose two
+- Actual required controls: A, B, and C
+- Result: Invalid question; excluded from scoring
+- Risk level: None assigned
+
+Why the question was invalid:
+
+- The IAM role in account B needs identity permissions for `s3:GetObject` and `kms:Decrypt`.
+- The S3 bucket policy in account A must allow the cross-account principal to read the object.
+- The KMS key policy in account A must allow the role or account B to use the KMS key; the role's IAM policy alone cannot make an external KMS key usable.
+- Therefore, the correct design requires three authorization layers, but the prompt required exactly two selections.
+
+Reasoning quality:
+
+- Correctly rejected D and E.
+- Correctly identified that a KMS key-policy change in account A was still required.
+- The statement that C removes the need for IAM-role permissions was incorrect: cross-account KMS use requires both the key-side permission and identity-side permission.
+
+## Previous valid result
 
 ### Q18 - RDS Multi-AZ vs Read Replica
 
@@ -31,7 +55,7 @@ Reasoning quality:
 - Correctly rejected Redis because arbitrary complex reporting queries are not a good fit for caching every SELECT result.
 - Correctly questioned the use of the standby for reads; that distinction should now be made explicit rather than treated as unknown.
 
-## Previous result
+## Earlier result
 
 ### Q17 - VPC endpoints vs NAT Gateway
 
@@ -57,6 +81,7 @@ Questions should:
 - mix cost, operations, availability, security, and change size
 - include multiple-response questions when useful
 - grade reasoning strictly
+- be checked so the declared number of selections matches the actual correct controls
 
 ## Known weak areas to retest
 
@@ -74,7 +99,7 @@ Questions should:
 
 Do not choose an exam date until the following are true:
 
-- Q30 is completed.
+- 30 valid scored questions are completed.
 - Confidence-adjusted score is calculated.
 - All wrong or uncertain answers have a service note or comparison note.
 - High-risk misconceptions are retested.
