@@ -2,13 +2,37 @@
 
 ## Current position
 
-- Completed through: Q23
+- Completed through: Q24
 - Q19: invalid question; excluded from scoring
-- Next question: Q24
+- Next question: Q25
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q24 - DynamoDB capacity mode for unpredictable spikes
+
+- User answer: B
+- Correct answer: C
+- Confidence: 2/5
+- Result: Incorrect
+- Risk level: Vocabulary and concept gap
+
+Why:
+
+- DynamoDB on-demand capacity mode is designed for workloads with unknown, unpredictable, or highly variable request traffic.
+- It removes read/write capacity planning and charges per request, which avoids paying for large idle provisioned capacity during normal low-traffic periods.
+- Provisioned capacity with Auto Scaling is more appropriate when traffic is reasonably predictable or changes gradually enough for scaling policies to react.
+- A sudden event-driven spike of tens of times within minutes can arrive before target-tracking Auto Scaling has raised provisioned capacity sufficiently.
+- DAX is a read cache and does not remove write-capacity requirements or solve unpredictable write spikes.
+
+Reasoning quality:
+
+- Correctly rejected fixed maximum provisioned capacity because it wastes money during normal low traffic.
+- Correctly recognized that DAX is not the general solution to capacity variation.
+- The missing concept was the DynamoDB on-demand capacity mode and when it is preferred over provisioned Auto Scaling.
+
+## Previous results
 
 ### Q23 - SNS fan-out, SQS, Lambda, and DLQ
 
@@ -17,25 +41,6 @@
 - Confidence: 5/5
 - Result: Incorrect
 - Risk level: High-risk misconception
-
-Why:
-
-- SNS publishes one order event to multiple independent subscribers.
-- A separate SQS queue for each downstream process lets inventory, billing, and shipping scale and fail independently.
-- SQS retains messages while a Lambda consumer is temporarily unavailable.
-- Lambda event source mappings consume from each queue, while an SQS redrive policy moves repeatedly failing messages to a dead-letter queue.
-- A single shared SQS queue uses competing consumers; each message is normally processed by one consumer rather than broadcast to all three.
-- Adding another SNS subscription and SQS queue enables a new downstream process without changing the order-ingestion Lambda.
-
-Reasoning quality:
-
-- Correctly selected C for queue consumption and failed-message isolation.
-- Correctly rejected a shared SQS queue because it does not broadcast every order to all processors.
-- Incorrectly rejected B: the SNS-to-SQS layer is what provides fan-out and buffering when a consumer is unavailable.
-- The prompt explicitly required two selections; answering only C is independently incorrect.
-- A is wrong mainly because synchronous sequential invocation creates coupling and failure propagation, not primarily because of cost.
-
-## Previous results
 
 ### Q22 - Shared POSIX file system across multiple AZs
 
@@ -89,6 +94,8 @@ Questions should:
 - Multi-response requirement reading
 - SNS fan-out vs a shared SQS queue
 - Lambda with SQS retry and dead-letter queue behavior
+- DynamoDB on-demand vs provisioned capacity with Auto Scaling
+- DynamoDB capacity behavior during sudden traffic spikes
 - DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
 - RPO vs RTO interpretation
 - Route 53 routing policies
