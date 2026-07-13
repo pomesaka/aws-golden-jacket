@@ -2,13 +2,39 @@
 
 ## Current position
 
-- Completed through: Q29
+- Completed through: Q30
 - Q19: invalid question; excluded from scoring
-- Next question: Q30
+- Next step: calculate score, confidence-adjusted score, and retest priorities
 - Mode: hard mode from Q15 onward
-- Target total: 30 valid scored questions
+- Target total: 30 valid scored questions reached
 
 ## Latest result
+
+### Q30 - CloudFront OAC and private S3 origin
+
+- User answer: A, B
+- Correct answer: A, B
+- Confidence: 4/5
+- Result: Correct
+- Risk level: Low; one infrastructure-model detail needed clarification
+
+Why:
+
+- Origin Access Control (OAC) is the recommended method for authenticated CloudFront requests to a regular S3 bucket origin.
+- With the recommended `always` signing behavior, CloudFront signs origin requests with SigV4.
+- The S3 bucket policy should allow the CloudFront service principal and restrict it with `AWS:SourceArn` to the intended distribution ARN.
+- This lets the bucket remain private and prevents direct unauthenticated S3 URL access.
+- An S3 website endpoint is a custom origin and cannot use OAC or OAI.
+- Public-read access violates the private-origin requirement.
+- CloudFront distributions do not have security groups that can be referenced by an S3 bucket policy. Security groups apply to network interfaces/resources inside a VPC, while CloudFront is a global edge service and S3 access is authorized through IAM-style resource policies and OAC signing.
+
+Reasoning quality:
+
+- Correctly selected OAC and the distribution-restricted bucket policy.
+- Correctly rejected public S3 and website-endpoint designs.
+- The only uncertainty was why a CloudFront security group cannot be used; this is now clarified.
+
+## Previous results
 
 ### Q29 - VPC endpoints for S3 and Secrets Manager
 
@@ -17,25 +43,6 @@
 - Confidence: 5/5
 - Result: Correct
 - Risk level: Low
-
-Why:
-
-- Amazon S3 supports a Gateway VPC Endpoint, which allows private access without an internet gateway or NAT device.
-- Gateway endpoints have no additional hourly or data-processing charge.
-- AWS Secrets Manager is accessed privately through an Interface VPC Endpoint powered by AWS PrivateLink.
-- A Secrets Manager interface endpoint removes the need for an internet gateway or NAT device and can use private DNS.
-- Option A is wrong because Secrets Manager does not use a Gateway VPC Endpoint.
-- Option C fails the no-internet-path and NAT-cost requirements.
-- Option D unnecessarily uses an S3 interface endpoint and still relies on an internet gateway for Secrets Manager.
-
-Reasoning quality:
-
-- Correctly eliminated NAT and internet-gateway designs because the requirement was private AWS-service access.
-- Correctly recognized S3 Gateway Endpoint as the cost-efficient default for VPC-based S3 access.
-- Correctly distinguished Gateway Endpoint services from Interface Endpoint services.
-- Confidence was appropriately high.
-
-## Previous results
 
 ### Q28 - Lambda, RDS Proxy, and connection storms
 
@@ -147,6 +154,8 @@ Questions should:
 - Aurora replica promotion and writer failover
 - RDS Proxy connection pooling, multiplexing, and session pinning
 - Aurora Global Database vs single-Region Aurora and RDS Proxy
+- CloudFront OAC, OAI, S3 bucket policies, and website endpoints
+- CloudFront as a global service vs VPC security-group-controlled resources
 - DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
 - RPO vs RTO interpretation
 - Route 53 routing policies
@@ -156,10 +165,8 @@ Questions should:
 
 ## Completion criteria before booking SAA
 
-Do not choose an exam date until the following are true:
-
-- 30 valid scored questions are completed.
-- Confidence-adjusted score is calculated.
-- All wrong or uncertain answers have a service note or comparison note.
-- High-risk misconceptions are retested.
-- Current AWS SAA exam guide is checked from the official AWS source.
+- 30 valid scored questions are completed. Done.
+- Confidence-adjusted score is calculated. Pending.
+- All wrong or uncertain answers have a service note or comparison note. Partially complete.
+- High-risk misconceptions are retested. Pending.
+- Current AWS SAA exam guide is checked from the official AWS source. Pending.
