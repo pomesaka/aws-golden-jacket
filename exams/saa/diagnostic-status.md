@@ -2,12 +2,36 @@
 
 ## Current position
 
-- Completed through: Q17
-- Next question: Q18
+- Completed through: Q18
+- Next question: Q19
 - Mode: hard mode from Q15 onward
 - Target total: 30 questions
 
 ## Latest result
+
+### Q18 - RDS Multi-AZ vs Read Replica
+
+- User answer: B
+- Correct answer: B
+- Confidence: 4/5
+- Result: Correct
+- Risk level: Low
+
+Why:
+
+- RDS Multi-AZ is primarily for high availability and automatic failover.
+- A traditional Multi-AZ standby is not used to serve read traffic.
+- A Read Replica uses asynchronous replication and can offload read-heavy reporting queries.
+- Keeping Multi-AZ while adding a Read Replica preserves failover capability and reduces load on the primary DB.
+- The stated tolerance for data being a few seconds old makes asynchronous replication acceptable.
+
+Reasoning quality:
+
+- Correctly rejected disabling Multi-AZ because automatic failover must remain.
+- Correctly rejected Redis because arbitrary complex reporting queries are not a good fit for caching every SELECT result.
+- Correctly questioned the use of the standby for reads; that distinction should now be made explicit rather than treated as unknown.
+
+## Previous result
 
 ### Q17 - VPC endpoints vs NAT Gateway
 
@@ -16,14 +40,6 @@
 - Confidence: 4/5
 - Result: Incorrect
 - Risk level: High-risk misconception
-
-Why:
-
-- Amazon S3 should use a Gateway VPC Endpoint for private, no-NAT access and no additional endpoint charge.
-- AWS Secrets Manager requires an Interface VPC Endpoint; enabling Private DNS allows use of the standard regional service hostname.
-- A public NAT Gateway requires an internet gateway for internet-bound traffic, which violates the stated requirement.
-- A single NAT Gateway in one Availability Zone also creates an availability dependency and cross-AZ data-path cost risk.
-- The question explicitly required two answers; selecting only one should be treated as incorrect even if the selected option were otherwise plausible.
 
 Concept gap:
 
