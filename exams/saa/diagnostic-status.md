@@ -2,13 +2,40 @@
 
 ## Current position
 
-- Completed through: Q28
+- Completed through: Q29
 - Q19: invalid question; excluded from scoring
-- Next question: Q29
+- Next question: Q30
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q29 - VPC endpoints for S3 and Secrets Manager
+
+- User answer: B
+- Correct answer: B
+- Confidence: 5/5
+- Result: Correct
+- Risk level: Low
+
+Why:
+
+- Amazon S3 supports a Gateway VPC Endpoint, which allows private access without an internet gateway or NAT device.
+- Gateway endpoints have no additional hourly or data-processing charge.
+- AWS Secrets Manager is accessed privately through an Interface VPC Endpoint powered by AWS PrivateLink.
+- A Secrets Manager interface endpoint removes the need for an internet gateway or NAT device and can use private DNS.
+- Option A is wrong because Secrets Manager does not use a Gateway VPC Endpoint.
+- Option C fails the no-internet-path and NAT-cost requirements.
+- Option D unnecessarily uses an S3 interface endpoint and still relies on an internet gateway for Secrets Manager.
+
+Reasoning quality:
+
+- Correctly eliminated NAT and internet-gateway designs because the requirement was private AWS-service access.
+- Correctly recognized S3 Gateway Endpoint as the cost-efficient default for VPC-based S3 access.
+- Correctly distinguished Gateway Endpoint services from Interface Endpoint services.
+- Confidence was appropriately high.
+
+## Previous results
 
 ### Q28 - Lambda, RDS Proxy, and connection storms
 
@@ -17,24 +44,6 @@
 - Confidence: 5/5
 - Result: Correct
 - Risk level: Low
-
-Why:
-
-- Rapid Lambda scale-out can create many concurrent database connections and exhaust the Aurora connection limit.
-- RDS Proxy pools and reuses database connections, reducing the number of physical connections opened against Aurora.
-- RDS Proxy is designed for highly concurrent and serverless applications that can produce sudden connection spikes.
-- AWS Secrets Manager or IAM database authentication avoids embedding database credentials in application code.
-- Increasing Lambda memory or creating larger per-runtime pools does not coordinate connections across separate Lambda execution environments.
-- ElastiCache is a data cache and is not a transparent database connection proxy.
-- Aurora Global Database addresses cross-Region replication and disaster recovery, not connection pooling.
-
-Reasoning quality:
-
-- Correctly mapped the Lambda connection-storm scenario to RDS Proxy.
-- Correctly recognized that the question directly tested the concept discussed immediately beforehand.
-- Confidence was appropriately high.
-
-## Previous results
 
 ### Q27 - Aurora readers, endpoints, and failover
 
