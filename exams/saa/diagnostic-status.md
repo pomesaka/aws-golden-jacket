@@ -2,13 +2,41 @@
 
 ## Current position
 
-- Completed through: Q24
+- Completed through: Q25
 - Q19: invalid question; excluded from scoring
-- Next question: Q25
+- Next question: Q26
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q25 - Organizations SCP regional guardrail
+
+- User answer: A, B
+- Correct answer: A, B
+- Confidence: 2/5
+- Result: Correct
+- Risk level: Correct but weak confidence
+
+Why:
+
+- An SCP attached to the development OU centrally limits the maximum permissions available to all current and future member accounts placed in that OU.
+- A deny statement using the `aws:RequestedRegion` global condition key can block regional API operations outside approved Regions.
+- Global services such as IAM and AWS Organizations must be excluded from the deny statement because their API endpoints do not behave like ordinary regional services.
+- SCPs do not grant permissions. IAM identity policies and resource policies must still grant the requested action.
+- Replacing AdministratorAccess in every account would create per-account maintenance and would not automatically govern future accounts.
+- Detective controls report noncompliance but do not prevent prohibited operations.
+- Permissions boundaries are attached to individual IAM users or roles and are not inherited automatically from an Organizations OU.
+
+Reasoning quality:
+
+- Correctly rejected per-account IAM policy replacement because it violates centralized and future-account requirements.
+- Correctly distinguished detective controls from preventive enforcement.
+- Correctly rejected the claim that an SCP Allow grants permissions.
+- Correctly recognized that permissions boundaries would require identity-level attachment rather than OU inheritance.
+- Confidence was low because SCP and `aws:RequestedRegion` behavior were not yet familiar; retest this later with policy-evaluation scenarios.
+
+## Previous results
 
 ### Q24 - DynamoDB capacity mode for unpredictable spikes
 
@@ -17,22 +45,6 @@
 - Confidence: 2/5
 - Result: Incorrect
 - Risk level: Vocabulary and concept gap
-
-Why:
-
-- DynamoDB on-demand capacity mode is designed for workloads with unknown, unpredictable, or highly variable request traffic.
-- It removes read/write capacity planning and charges per request, which avoids paying for large idle provisioned capacity during normal low-traffic periods.
-- Provisioned capacity with Auto Scaling is more appropriate when traffic is reasonably predictable or changes gradually enough for scaling policies to react.
-- A sudden event-driven spike of tens of times within minutes can arrive before target-tracking Auto Scaling has raised provisioned capacity sufficiently.
-- DAX is a read cache and does not remove write-capacity requirements or solve unpredictable write spikes.
-
-Reasoning quality:
-
-- Correctly rejected fixed maximum provisioned capacity because it wastes money during normal low traffic.
-- Correctly recognized that DAX is not the general solution to capacity variation.
-- The missing concept was the DynamoDB on-demand capacity mode and when it is preferred over provisioned Auto Scaling.
-
-## Previous results
 
 ### Q23 - SNS fan-out, SQS, Lambda, and DLQ
 
@@ -89,6 +101,8 @@ Questions should:
 
 - IAM policy vs resource policy vs KMS key policy
 - Cross-account S3 access with SSE-KMS
+- Organizations SCP vs IAM policy vs permissions boundary
+- SCP regional guardrails with `aws:RequestedRegion` and global-service exclusions
 - VPC Gateway Endpoint vs Interface Endpoint
 - NAT Gateway vs VPC Endpoint
 - Multi-response requirement reading
