@@ -2,13 +2,38 @@
 
 ## Current position
 
-- Completed through: Q25
+- Completed through: Q26
 - Q19: invalid question; excluded from scoring
-- Next question: Q26
+- Next question: Q27
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q26 - S3 lifecycle and archive retrieval time
+
+- User answer: C
+- Correct answer: C
+- Confidence: 1/5
+- Result: Correct
+- Risk level: Correct by limited familiarity; storage-class vocabulary needs reinforcement
+
+Why:
+
+- The first 30 days require frequent access, so objects can remain in S3 Standard.
+- S3 Lifecycle can automatically transition the objects after 30 days and expire them after seven years.
+- S3 Glacier Deep Archive is designed for long-lived archive data accessed less than once a year and has a 180-day minimum storage duration.
+- Standard retrieval from S3 Glacier Deep Archive is typically completed within 12 hours, which satisfies the stated requirement.
+- S3 Glacier Flexible Retrieval also satisfies the restore-time requirement, but it has a higher storage cost than Deep Archive and is unnecessary when 12-hour restoration is acceptable.
+- S3 Standard-IA and S3 One Zone-IA provide millisecond access, which is more performance and cost than the requirement needs.
+- S3 One Zone-IA is not appropriate as the primary compliance copy because it is stored in a single Availability Zone.
+
+Reasoning quality:
+
+- The selected answer was correct, but the reasoning depended on prior exposure to Deep Archive rather than a comparison of retrieval time, durability model, and cost.
+- Retest Glacier Instant Retrieval, Flexible Retrieval, Deep Archive, Standard-IA, and One Zone-IA selection later.
+
+## Previous results
 
 ### Q25 - Organizations SCP regional guardrail
 
@@ -17,26 +42,6 @@
 - Confidence: 2/5
 - Result: Correct
 - Risk level: Correct but weak confidence
-
-Why:
-
-- An SCP attached to the development OU centrally limits the maximum permissions available to all current and future member accounts placed in that OU.
-- A deny statement using the `aws:RequestedRegion` global condition key can block regional API operations outside approved Regions.
-- Global services such as IAM and AWS Organizations must be excluded from the deny statement because their API endpoints do not behave like ordinary regional services.
-- SCPs do not grant permissions. IAM identity policies and resource policies must still grant the requested action.
-- Replacing AdministratorAccess in every account would create per-account maintenance and would not automatically govern future accounts.
-- Detective controls report noncompliance but do not prevent prohibited operations.
-- Permissions boundaries are attached to individual IAM users or roles and are not inherited automatically from an Organizations OU.
-
-Reasoning quality:
-
-- Correctly rejected per-account IAM policy replacement because it violates centralized and future-account requirements.
-- Correctly distinguished detective controls from preventive enforcement.
-- Correctly rejected the claim that an SCP Allow grants permissions.
-- Correctly recognized that permissions boundaries would require identity-level attachment rather than OU inheritance.
-- Confidence was low because SCP and `aws:RequestedRegion` behavior were not yet familiar; retest this later with policy-evaluation scenarios.
-
-## Previous results
 
 ### Q24 - DynamoDB capacity mode for unpredictable spikes
 
@@ -110,6 +115,8 @@ Questions should:
 - Lambda with SQS retry and dead-letter queue behavior
 - DynamoDB on-demand vs provisioned capacity with Auto Scaling
 - DynamoDB capacity behavior during sudden traffic spikes
+- S3 storage-class selection: Standard-IA, One Zone-IA, Glacier Instant Retrieval, Flexible Retrieval, and Deep Archive
+- S3 archive restore times and minimum storage durations
 - DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
 - RPO vs RTO interpretation
 - Route 53 routing policies
