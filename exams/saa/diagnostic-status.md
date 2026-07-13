@@ -2,13 +2,38 @@
 
 ## Current position
 
-- Completed through: Q18
+- Completed through: Q20
 - Q19: invalid question; excluded from scoring
-- Next question: Q20
+- Next question: Q21
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q20 - Disaster recovery strategy
+
+- User answer: B
+- Correct answer: D
+- Confidence: 2/5
+- Result: Incorrect
+- Risk level: Concept gap
+
+Why:
+
+- Multi-site (A) provides the fastest recovery but has the highest steady-state cost.
+- Warm standby (B) keeps a scaled-down but functional application environment running in the recovery Region, so its steady-state cost is higher than pilot light.
+- Backup and restore (C) has the lowest steady-state cost but is unlikely to satisfy both RPO 15 minutes and RTO 1 hour when all resources must be rebuilt from snapshots.
+- Pilot light (D) keeps the critical data layer and minimal core resources ready, continuously replicates data, and scales out the stateless application tier after a disaster.
+- Given RPO 15 minutes, RTO 1 hour, stateless application servers, and a requirement to minimize normal operating cost, pilot light is the best fit.
+
+Reasoning quality:
+
+- Correctly rejected multi-site because of cost.
+- Correctly narrowed the decision to warm standby versus pilot light.
+- Incorrectly assumed warm standby was cheaper than pilot light; the opposite is generally true because warm standby keeps a working scaled-down environment running continuously.
+- Snapshot frequency primarily affects RPO, not RTO. RTO is dominated by how long restoration, provisioning, scaling, validation, and DNS failover take.
+
+## Previous result
 
 ### Q19 - Cross-account S3 + SSE-KMS
 
@@ -25,13 +50,7 @@ Why the question was invalid:
 - The KMS key policy in account A must allow the role or account B to use the KMS key; the role's IAM policy alone cannot make an external KMS key usable.
 - Therefore, the correct design requires three authorization layers, but the prompt required exactly two selections.
 
-Reasoning quality:
-
-- Correctly rejected D and E.
-- Correctly identified that a KMS key-policy change in account A was still required.
-- The statement that C removes the need for IAM-role permissions was incorrect: cross-account KMS use requires both the key-side permission and identity-side permission.
-
-## Previous valid result
+## Earlier valid result
 
 ### Q18 - RDS Multi-AZ vs Read Replica
 
@@ -47,27 +66,6 @@ Why:
 - A traditional Multi-AZ standby is not used to serve read traffic.
 - A Read Replica uses asynchronous replication and can offload read-heavy reporting queries.
 - Keeping Multi-AZ while adding a Read Replica preserves failover capability and reduces load on the primary DB.
-- The stated tolerance for data being a few seconds old makes asynchronous replication acceptable.
-
-Reasoning quality:
-
-- Correctly rejected disabling Multi-AZ because automatic failover must remain.
-- Correctly rejected Redis because arbitrary complex reporting queries are not a good fit for caching every SELECT result.
-- Correctly questioned the use of the standby for reads; that distinction should now be made explicit rather than treated as unknown.
-
-## Earlier result
-
-### Q17 - VPC endpoints vs NAT Gateway
-
-- User answer: F
-- Correct answer: B, D
-- Confidence: 4/5
-- Result: Incorrect
-- Risk level: High-risk misconception
-
-Concept gap:
-
-Do not evaluate each VPC endpoint option as a complete solution in isolation when the question asks for multiple responses. Combine the service-specific endpoint types needed to satisfy the full set of requirements.
 
 ## Operating rules
 
@@ -90,6 +88,8 @@ Questions should:
 - VPC Gateway Endpoint vs Interface Endpoint
 - NAT Gateway vs VPC Endpoint
 - Multi-response requirement reading
+- DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
+- RPO vs RTO interpretation
 - Route 53 routing policies
 - CloudFront vs Global Accelerator
 - S3 vs EFS vs EBS default service selection
