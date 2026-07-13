@@ -2,13 +2,39 @@
 
 ## Current position
 
-- Completed through: Q27
+- Completed through: Q28
 - Q19: invalid question; excluded from scoring
-- Next question: Q28
+- Next question: Q29
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q28 - Lambda, RDS Proxy, and connection storms
+
+- User answer: C
+- Correct answer: C
+- Confidence: 5/5
+- Result: Correct
+- Risk level: Low
+
+Why:
+
+- Rapid Lambda scale-out can create many concurrent database connections and exhaust the Aurora connection limit.
+- RDS Proxy pools and reuses database connections, reducing the number of physical connections opened against Aurora.
+- RDS Proxy is designed for highly concurrent and serverless applications that can produce sudden connection spikes.
+- AWS Secrets Manager or IAM database authentication avoids embedding database credentials in application code.
+- Increasing Lambda memory or creating larger per-runtime pools does not coordinate connections across separate Lambda execution environments.
+- ElastiCache is a data cache and is not a transparent database connection proxy.
+- Aurora Global Database addresses cross-Region replication and disaster recovery, not connection pooling.
+
+Reasoning quality:
+
+- Correctly mapped the Lambda connection-storm scenario to RDS Proxy.
+- Correctly recognized that the question directly tested the concept discussed immediately beforehand.
+- Confidence was appropriately high.
+
+## Previous results
 
 ### Q27 - Aurora readers, endpoints, and failover
 
@@ -17,24 +43,6 @@
 - Confidence: 2/5
 - Result: Correct
 - Risk level: Correct but weak confidence
-
-Why:
-
-- Aurora supports multiple reader instances for read scaling.
-- The reader endpoint balances new read-only connections across available Aurora Replicas, so the application does not need to manage each instance endpoint.
-- If the writer fails and one Aurora Replica is promoted, the cluster endpoint continues to represent the current writer.
-- Having Aurora Replicas in multiple Availability Zones improves failover readiness and is faster than creating a new writer when no replica exists.
-- The reader endpoint is for distributing read connections; it is not the endpoint used for writes.
-- Aurora Global Database is for cross-Region reads and disaster recovery and is unnecessary for this single-Region requirement.
-- Sending all reads to the writer through RDS Proxy does not satisfy the read-scaling requirement.
-
-Reasoning quality:
-
-- Correctly selected the reader endpoint to avoid per-instance endpoint management.
-- The missing concept was that writer failover is handled separately through Aurora replica promotion and the cluster endpoint.
-- Retest cluster endpoint vs reader endpoint vs instance endpoint and failover behavior later.
-
-## Previous results
 
 ### Q26 - S3 lifecycle and archive retrieval time
 
@@ -128,6 +136,8 @@ Questions should:
 - S3 archive restore times and minimum storage durations
 - Aurora cluster endpoint vs reader endpoint vs instance endpoint
 - Aurora replica promotion and writer failover
+- RDS Proxy connection pooling, multiplexing, and session pinning
+- Aurora Global Database vs single-Region Aurora and RDS Proxy
 - DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
 - RPO vs RTO interpretation
 - Route 53 routing policies
