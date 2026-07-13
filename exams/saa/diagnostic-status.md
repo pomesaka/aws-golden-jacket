@@ -2,13 +2,40 @@
 
 ## Current position
 
-- Completed through: Q22
+- Completed through: Q23
 - Q19: invalid question; excluded from scoring
-- Next question: Q23
+- Next question: Q24
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q23 - SNS fan-out, SQS, Lambda, and DLQ
+
+- User answer: C
+- Correct answer: B, C
+- Confidence: 5/5
+- Result: Incorrect
+- Risk level: High-risk misconception
+
+Why:
+
+- SNS publishes one order event to multiple independent subscribers.
+- A separate SQS queue for each downstream process lets inventory, billing, and shipping scale and fail independently.
+- SQS retains messages while a Lambda consumer is temporarily unavailable.
+- Lambda event source mappings consume from each queue, while an SQS redrive policy moves repeatedly failing messages to a dead-letter queue.
+- A single shared SQS queue uses competing consumers; each message is normally processed by one consumer rather than broadcast to all three.
+- Adding another SNS subscription and SQS queue enables a new downstream process without changing the order-ingestion Lambda.
+
+Reasoning quality:
+
+- Correctly selected C for queue consumption and failed-message isolation.
+- Correctly rejected a shared SQS queue because it does not broadcast every order to all processors.
+- Incorrectly rejected B: the SNS-to-SQS layer is what provides fan-out and buffering when a consumer is unavailable.
+- The prompt explicitly required two selections; answering only C is independently incorrect.
+- A is wrong mainly because synchronous sequential invocation creates coupling and failure propagation, not primarily because of cost.
+
+## Previous results
 
 ### Q22 - Shared POSIX file system across multiple AZs
 
@@ -18,24 +45,6 @@
 - Result: Correct
 - Risk level: Low
 
-Why:
-
-- Amazon EFS Regional provides a managed, elastic, POSIX-compliant shared file system for Linux workloads.
-- Multiple EC2 instances can mount and concurrently read and write the same file system.
-- Regional EFS stores data across multiple Availability Zones and fits Auto Scaling groups spanning AZs.
-- Capacity scales automatically, reducing provisioning and operational overhead.
-- EBS Multi-Attach is limited to specific volume types and same-AZ attachment patterns and is not the default managed multi-AZ shared file-system choice.
-- Amazon S3 is object storage, not a general POSIX file system.
-- FSx for Windows File Server targets Windows/SMB workloads rather than Linux POSIX requirements.
-
-Reasoning quality:
-
-- Correctly selected EFS based on shared access, POSIX compatibility, elasticity, and multi-AZ availability.
-- Correctly rejected Windows File Server and S3 for the stated interface requirements.
-- The EBS rejection was directionally correct, but should be stated more precisely: EBS Multi-Attach is not a cross-AZ shared file system and requires application-level clustered file-system coordination.
-
-## Previous result
-
 ### Q21 - Route 53 vs CloudFront vs Global Accelerator
 
 - User answer: C
@@ -44,15 +53,6 @@ Reasoning quality:
 - Result: Correct
 - Risk level: Low
 
-Why:
-
-- AWS Global Accelerator provides static anycast IP addresses.
-- It supports TCP and UDP listeners.
-- It routes users onto the AWS global network toward healthy regional endpoints.
-- Health checks and endpoint failover are not dependent on waiting for DNS caches to expire.
-
-## Earlier result
-
 ### Q20 - Disaster recovery strategy
 
 - User answer: B
@@ -60,13 +60,6 @@ Why:
 - Confidence: 2/5
 - Result: Incorrect
 - Risk level: Concept gap
-
-Concept gap:
-
-- Warm standby costs more than pilot light because it keeps a scaled-down functional environment running continuously.
-- Snapshot frequency mainly affects RPO; restore and provisioning time dominate RTO.
-
-## Invalid question
 
 ### Q19 - Cross-account S3 + SSE-KMS
 
@@ -94,6 +87,8 @@ Questions should:
 - VPC Gateway Endpoint vs Interface Endpoint
 - NAT Gateway vs VPC Endpoint
 - Multi-response requirement reading
+- SNS fan-out vs a shared SQS queue
+- Lambda with SQS retry and dead-letter queue behavior
 - DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
 - RPO vs RTO interpretation
 - Route 53 routing policies
