@@ -2,13 +2,39 @@
 
 ## Current position
 
-- Completed through: Q26
+- Completed through: Q27
 - Q19: invalid question; excluded from scoring
-- Next question: Q27
+- Next question: Q28
 - Mode: hard mode from Q15 onward
 - Target total: 30 valid scored questions
 
 ## Latest result
+
+### Q27 - Aurora readers, endpoints, and failover
+
+- User answer: A
+- Correct answer: A
+- Confidence: 2/5
+- Result: Correct
+- Risk level: Correct but weak confidence
+
+Why:
+
+- Aurora supports multiple reader instances for read scaling.
+- The reader endpoint balances new read-only connections across available Aurora Replicas, so the application does not need to manage each instance endpoint.
+- If the writer fails and one Aurora Replica is promoted, the cluster endpoint continues to represent the current writer.
+- Having Aurora Replicas in multiple Availability Zones improves failover readiness and is faster than creating a new writer when no replica exists.
+- The reader endpoint is for distributing read connections; it is not the endpoint used for writes.
+- Aurora Global Database is for cross-Region reads and disaster recovery and is unnecessary for this single-Region requirement.
+- Sending all reads to the writer through RDS Proxy does not satisfy the read-scaling requirement.
+
+Reasoning quality:
+
+- Correctly selected the reader endpoint to avoid per-instance endpoint management.
+- The missing concept was that writer failover is handled separately through Aurora replica promotion and the cluster endpoint.
+- Retest cluster endpoint vs reader endpoint vs instance endpoint and failover behavior later.
+
+## Previous results
 
 ### Q26 - S3 lifecycle and archive retrieval time
 
@@ -17,23 +43,6 @@
 - Confidence: 1/5
 - Result: Correct
 - Risk level: Correct by limited familiarity; storage-class vocabulary needs reinforcement
-
-Why:
-
-- The first 30 days require frequent access, so objects can remain in S3 Standard.
-- S3 Lifecycle can automatically transition the objects after 30 days and expire them after seven years.
-- S3 Glacier Deep Archive is designed for long-lived archive data accessed less than once a year and has a 180-day minimum storage duration.
-- Standard retrieval from S3 Glacier Deep Archive is typically completed within 12 hours, which satisfies the stated requirement.
-- S3 Glacier Flexible Retrieval also satisfies the restore-time requirement, but it has a higher storage cost than Deep Archive and is unnecessary when 12-hour restoration is acceptable.
-- S3 Standard-IA and S3 One Zone-IA provide millisecond access, which is more performance and cost than the requirement needs.
-- S3 One Zone-IA is not appropriate as the primary compliance copy because it is stored in a single Availability Zone.
-
-Reasoning quality:
-
-- The selected answer was correct, but the reasoning depended on prior exposure to Deep Archive rather than a comparison of retrieval time, durability model, and cost.
-- Retest Glacier Instant Retrieval, Flexible Retrieval, Deep Archive, Standard-IA, and One Zone-IA selection later.
-
-## Previous results
 
 ### Q25 - Organizations SCP regional guardrail
 
@@ -117,6 +126,8 @@ Questions should:
 - DynamoDB capacity behavior during sudden traffic spikes
 - S3 storage-class selection: Standard-IA, One Zone-IA, Glacier Instant Retrieval, Flexible Retrieval, and Deep Archive
 - S3 archive restore times and minimum storage durations
+- Aurora cluster endpoint vs reader endpoint vs instance endpoint
+- Aurora replica promotion and writer failover
 - DR strategy selection: backup and restore vs pilot light vs warm standby vs multi-site
 - RPO vs RTO interpretation
 - Route 53 routing policies
