@@ -1,6 +1,6 @@
 # SAA Session Handoff
 
-Last updated: 2026-07-13
+Last updated: 2026-07-18
 
 ## Current status
 
@@ -11,8 +11,8 @@ Last updated: 2026-07-13
 - Incorrect: 5
 - Raw score: 82.1%
 - Confidence-adjusted learning score: 76.8%
-- Mode: hard mode from Q15 onward
-- Recommendation: do not book the exam yet; complete weak-area retests and a full-length mixed mock first
+- Mode: uncovered-topic questions at SAA-plus difficulty, with SAP-level related knowledge explained after grading
+- Recommendation: do not book the exam yet; complete uncovered-topic coverage and a full-length mixed mock first
 
 ## Important scoring note
 
@@ -48,6 +48,8 @@ The diagnostic was designed to measure readiness, not to fully cover every SAA t
 - EFS for shared POSIX access
 - Basic KMS and S3 SSE-KMS permission layering
 - Basic SCP preventive guardrail concept
+- ECS/Fargate selection based on operational responsibility
+- Private Fargate access to ECR, S3, CloudWatch Logs, and Secrets Manager through VPC endpoints
 
 ## Weak services to prioritize
 
@@ -68,6 +70,7 @@ The diagnostic was designed to measure readiness, not to fully cover every SAA t
 5. Distinguish connection pooling, caching, read scaling, and database HA
 6. Prefer the best-fit solution, not merely a technically possible solution
 7. Watch for wording such as DNS-level, private path, minimal changes, global static IP, or immediate retrieval
+8. Build a stronger mental model of network interfaces, ENIs, MAC addresses, and endpoint ENIs
 
 ## Topics covered in the diagnostic
 
@@ -92,6 +95,56 @@ The diagnostic was designed to measure readiness, not to fully cover every SAA t
 - RDS Proxy
 - Gateway vs Interface VPC Endpoints
 - CloudFront OAC and private S3 origin
+
+## Uncovered-topic quiz progress
+
+### Q1: ALB vs NLB vs GWLB
+
+- Answer selection slip, but reasoning identified the intended answer.
+- GWLB was initially unknown.
+- Follow-up covered GWLB, GWLBe, third-party virtual appliances, centralized inspection VPCs, GENEVE over UDP 6081, symmetric routing, Transit Gateway appliance mode, and why reverse traffic can hit a different stateful firewall.
+
+### Q2: Auto Scaling health checks
+
+- Answer: A
+- Confidence: 5/5
+- Correct.
+- Question was judged too easy and should not be used as the target difficulty.
+
+### Q3: Auto Scaling Instance Refresh
+
+- User selected A, C, D with confidence 4/5 based partly on Kubernetes operational intuition.
+- The question was invalid because B was also correct despite asking for three choices.
+- Follow-up covered Min/Max Healthy Percentage, health-check grace period, instance warmup, lifecycle hooks, checkpoints, bake time, CloudWatch alarms, auto rollback limitations, launch-template versions, skip matching, scaling interactions, maintenance policies, Spot/Mixed Instances, AZ capacity, and deregistration delay.
+- Key distinction retained:
+  - Grace period: do not kill an instance while it is still initializing.
+  - Warmup: do not count a newly healthy instance as fully settled yet.
+  - Deregistration delay: load-balancer-side connection draining, usually combined with lifecycle hooks and application shutdown handling.
+
+### Q4: ECS compute mode selection
+
+- Answer: B, ECS on AWS Fargate
+- Confidence: 4/5
+- Correct.
+- Reasoning correctly eliminated ECS on EC2 due to host management and EKS managed node groups due to higher Kubernetes operational overhead.
+- ECS Anywhere was introduced as ECS control of external/on-premises hosts.
+- Follow-up covered cases requiring host access: security/monitoring agents, host paths, Docker socket, special devices, low-level networking, kernel/eBPF, and node-level agents.
+
+### Q5: Private Fargate access to AWS services
+
+- Answer: A, B, E
+- Confidence: 4/5
+- Correct.
+- Strong point: explicitly recognized that ECR image layers require S3 connectivity in addition to ECR API and ECR DKR endpoints.
+- Follow-up covered Interface endpoints, S3 Gateway endpoint, per-AZ endpoint ENIs, Private DNS, endpoint security groups, task execution IAM roles, endpoint policies, NAT cost and availability tradeoffs, and subnet IP consumption.
+
+## Recent networking deep dives
+
+- A network interface is the OS-visible send/receive attachment point, such as `en0`, `eth0`, or `ens5`.
+- A machine may have multiple network interfaces, and each interface normally has its own MAC address.
+- In AWS, an ENI is a VPC-scoped virtual NIC carrying subnet/AZ placement, private IPs, MAC address, security groups, and other attributes.
+- An AWS Interface VPC Endpoint is materially implemented by endpoint ENIs placed into selected subnets, plus PrivateLink service attachment, DNS integration, security groups, endpoint policies, and control-plane management.
+- A Gateway VPC Endpoint is different: it does not place an endpoint ENI in the subnet; it uses route-table entries for supported services such as S3 and DynamoDB.
 
 ## Important topics not yet covered well enough
 
@@ -119,6 +172,7 @@ The diagnostic was designed to measure readiness, not to fully cover every SAA t
 - PrivateLink architecture
 - NAT Gateway per-AZ design and cross-AZ cost
 - Network Firewall, security groups, NACLs
+- ENI behavior, multi-homing, source/destination checks, and subnet IP planning
 
 ### Security and governance
 
@@ -156,16 +210,13 @@ The diagnostic was designed to measure readiness, not to fully cover every SAA t
 
 ## Recommended next sequence
 
-1. Retest Q23 topic: SNS fan-out, one SQS queue per consumer, Lambda retry and DLQ behavior
-2. Retest Q17 topic: Gateway Endpoint, Interface Endpoint, NAT Gateway, route tables, private DNS
-3. Retest Q8 topic: Route 53 latency routing vs Global Accelerator
-4. Drill DR strategies with RPO/RTO scenarios
-5. Drill DynamoDB on-demand vs provisioned Auto Scaling
-6. Drill IAM + bucket policy + KMS key policy cross-account cases
-7. Drill S3 storage-class selection
-8. Drill Aurora endpoints and failover
-9. Run an uncovered-topic set of 20-30 questions
-10. Run a 65-question mixed mock under exam timing
+1. Continue uncovered-topic questions at SAA-plus difficulty, avoiding simple service-identification questions
+2. Drill DR strategies with RPO/RTO scenarios
+3. Drill DynamoDB on-demand vs provisioned Auto Scaling
+4. Drill IAM + bucket policy + KMS key policy cross-account cases
+5. Drill S3 storage-class selection
+6. Drill Aurora endpoints and failover
+7. Run a 65-question mixed mock under exam timing
 
 ## Exam booking gate
 
@@ -179,4 +230,4 @@ Do not book until all are true:
 
 ## Next-session instruction
 
-Start by reading this file and `exams/saa/diagnostic-summary.md` if present. Then continue with a targeted weak-area quiz, beginning with SNS/SQS/Lambda and VPC endpoint/NAT scenarios. Keep questions exam-like, use plausible distractors, and grade reasoning strictly.
+Start by reading this file and `exams/saa/diagnostic-summary.md` if present. Continue uncovered-topic questions at SAA-plus difficulty. After grading, explain SAP-level adjacent knowledge when it provides durable engineering understanding. Use plausible distractors, validate the requested number of correct choices, and grade reasoning strictly.
